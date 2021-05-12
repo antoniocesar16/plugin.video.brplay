@@ -151,15 +151,13 @@ def __refresh_token(refresh_token):
 
 def __login(user, password):
 
-    control.log('LOGIN OIPLAY')
-
     session = requests.session()
 
     url = 'https://apim.oi.net.br/oic?state=eyJzdGF0ZSI6InN0YXRlIiwidGFyZ2V0X3VyaSI6Ii9kby1sb2dpbiJ9&client_id=e722caf1-7c47-4398-ac7f-f75a5f843906&response_type=code&scope=openid%20customer_info%20oob&redirect_uri=https://oiplay.tv/login'
 
     response = session.get(url)
 
-    url = re.findall(r'action="([^"]+)"', response.content)[0]
+    url = re.findall(r'action="([^"]+)"', response.text)[0]
 
     url = 'https://logintv.oi.com.br' + url
 
@@ -174,11 +172,7 @@ def __login(user, password):
         'Ecom_Password': password
     })
 
-    # control.log(response.content)
-
-    url = re.findall(r"window.location.href='([^']+)';", response.content)[0]
-
-    control.log('GET %s' % url)
+    url = re.findall(r"window.location.href='([^']+)';", response.text)[0]
 
     response = session.get(url)
 
@@ -210,7 +204,6 @@ def __login(user, password):
     }
 
     token_response = session.post(ACCESS_TOKEN_URL, data=post)
-
     return json.loads(token_response.content, object_hook=as_python_object)
 
 
